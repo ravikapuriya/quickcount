@@ -1,7 +1,7 @@
 export const IS_BUILD = import.meta.env.MODE === 'production'; // Set to false for local testing without PlayGama
 
 // set to true when building for PlayGama platform
-export const IS_PLAYGAMA = true;
+export const IS_PLAYGAMA = false;
 
 export const GameOptions = {
     preloadBar: {
@@ -44,6 +44,9 @@ export const ASSET_KEYS = Object.freeze({
     // UI
     GAME_BG: 'GAME_BG',
     LOGO: 'LOGO',
+
+    // ATLAS
+    GAME_UI: 'GAME_UI',
     CONFETTI: 'CONFETTI',
 
     // AUDIO
@@ -56,11 +59,16 @@ export const ASSET_KEYS = Object.freeze({
 });
 
 export const ATLAS_ASSETS = [
-    // {
-    //     assetKey: ASSET_KEYS.GAME_UI,
-    //     path: 'assets/atlas/game-ui.png',
-    //     jsonPath: 'assets/atlas/game-ui.json'
-    // }
+    {
+        assetKey: ASSET_KEYS.GAME_UI,
+        path: 'assets/atlas/game-ui.png',
+        jsonPath: 'assets/atlas/game-ui.json'
+    },
+    {
+        assetKey: ASSET_KEYS.CONFETTI,
+        path: 'assets/atlas/confetti.png',
+        jsonPath: 'assets/atlas/confetti.json'
+    },
 ];
 
 export const IMAGE_ASSETS = [
@@ -68,10 +76,6 @@ export const IMAGE_ASSETS = [
         assetKey: ASSET_KEYS.GAME_BG,
         path: 'assets/images/blue_bg.png'
     },
-    {
-        assetKey: ASSET_KEYS.CONFETTI,
-        path: 'assets/images/confetti.png'
-    }
 ];
 
 export const AUDIO_ASSETS = [

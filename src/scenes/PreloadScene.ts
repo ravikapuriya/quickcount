@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { Sound } from '../systems/Sound'
-import { ATLAS_ASSETS, AUDIO_ASSETS, GameOptions, IMAGE_ASSETS, JSON_ASSETS, SCENE_KEYS } from '../data/gameConfigs';
+import { ATLAS_ASSETS, AUDIO_ASSETS, GameOptions, IMAGE_ASSETS, IS_BUILD, IS_PLAYGAMA, JSON_ASSETS, SCENE_KEYS } from '../data/gameConfigs';
+import { PlayGamaSDK } from '../systems/PlayGama';
 
 export class PreloadScene extends Phaser.Scene {
     constructor() { super(SCENE_KEYS.PRELOAD) }
@@ -42,19 +43,11 @@ export class PreloadScene extends Phaser.Scene {
         };
 
         for (const a of ATLAS_ASSETS) {
-            // this.load.atlas(a.assetKey, toUrl(a.path), toUrl(a.jsonPath));
+            this.load.atlas(a.assetKey, toUrl(a.path), toUrl(a.jsonPath));
         }
 
         for (const i of IMAGE_ASSETS) {
-            if (i.assetKey === 'CONFETTI') {
-                // Load confetti as spritesheet (6x6 grid = 36 frames)
-                this.load.spritesheet(i.assetKey, toUrl(i.path), {
-                    frameWidth: 128,
-                    frameHeight: 128
-                });
-            } else {
-                this.load.image(i.assetKey, toUrl(i.path));
-            }
+            this.load.image(i.assetKey, toUrl(i.path));
         }
 
         for (const au of AUDIO_ASSETS) {
@@ -81,8 +74,18 @@ export class PreloadScene extends Phaser.Scene {
     }
 
 
-    create() {
+    async create() {
         Sound.init(this);
+
+        // Initialize PlayGama SDK
+        if (IS_BUILD && IS_PLAYGAMA) {
+            const playGama = PlayGamaSDK.getInstance();
+            const isInitialized = await playGama.initialize();
+            if (isInitialized) {
+                await playGama.gameReady();
+            }
+        }
+
         this.scene.start(SCENE_KEYS.MENU);
     }
 }

@@ -20,7 +20,7 @@ export class UIScene extends Phaser.Scene {
     setTimeLeft(sec: number) { this.timerText.setText(`${sec.toFixed(1)}s`) }
 
     setTimerColor(color: string) { this.timerText.setColor(color) }
-    resetTimerColor() { this.timerText.setColor('#e6edf3') }
+    resetTimerColor() { this.timerText.setColor('#00559C') }
 
     getTimerPosition() {
         return { x: this.timerText.x, y: this.timerText.y }

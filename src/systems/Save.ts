@@ -8,6 +8,11 @@ export interface SaveData {
     sfx: boolean;
     music: boolean;
     lang: string;
+    powerups: {
+        freeze: number;
+        fifty: number;
+        slow: number;
+    };
 }
 
 const DEFAULT_SAVE: SaveData = {
@@ -16,7 +21,12 @@ const DEFAULT_SAVE: SaveData = {
     bestScores: {},
     sfx: true,
     music: true,
-    lang: 'en'
+    lang: 'en',
+    powerups: {
+        freeze: 3,
+        fifty: 3,
+        slow: 3
+    }
 }
 
 const SAVE_KEYS: (keyof SaveData)[] = [
@@ -25,11 +35,12 @@ const SAVE_KEYS: (keyof SaveData)[] = [
     'bestScores',
     'sfx',
     'music',
-    'lang'
+    'lang',
+    'powerups'
 ];
 
-const addKeyPrefix = (key: string): string => `rk.aq_${key}`;
-const removeKeyPrefix = (key: string): string => key.replace('rk.aq_', '');
+const addKeyPrefix = (key: string): string => `rk.quickcount.${key}`;
+const removeKeyPrefix = (key: string): string => key.replace('rk.quickcount.', '');
 
 let cache: SaveData | null = null;
 let pendingSave: Promise<SaveData> | null = null;
@@ -79,7 +90,7 @@ export const Save = {
     },
 
     async loadFromLocalStorage(): Promise<Partial<SaveData>> {
-        const data = localStorage.getItem('rk.aq_save');
+        const data = localStorage.getItem('rk.quickcount.save');
         return data ? JSON.parse(data) : {};
     },
 
@@ -107,7 +118,7 @@ export const Save = {
     },
 
     saveToLocalStorage(data: SaveData): void {
-        localStorage.setItem('rk.aq_save', JSON.stringify(data));
+        localStorage.setItem('rk.quickcount.save', JSON.stringify(data));
     },
 
     clearCache: function (): void {
