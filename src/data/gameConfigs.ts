@@ -1,7 +1,7 @@
 export const IS_BUILD = import.meta.env.MODE === 'production'; // Set to false for local testing without PlayGama
 
 // set to true when building for PlayGama platform
-export const IS_PLAYGAMA = true;
+export const IS_PLAYGAMA = false;
 
 export const GameOptions = {
     preloadBar: {
