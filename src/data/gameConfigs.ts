@@ -106,9 +106,4 @@ export const AUDIO_ASSETS = [
 ];
 
 export const JSON_ASSETS = [
-    // {
-    //     type: 'json',
-    //     assetKey: ASSET_KEYS.LANG_EN_TEXT,
-    //     path: 'assets/lang-data/en.json'
-    // },
 ];

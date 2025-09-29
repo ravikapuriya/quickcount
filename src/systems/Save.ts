@@ -78,8 +78,7 @@ export const Save = {
                     const originalKey = removeKeyPrefix(prefixedKey) as keyof SaveData;
                     loadedData[originalKey] = value;
                 }
-            } catch (error) {
-                console.warn('Failed to load save from SDK, falling back to localStorage', error);
+            } catch (_error) {
                 loadedData = await this.loadFromLocalStorage();
             }
         } else {
@@ -108,8 +107,7 @@ export const Save = {
                     prefixedData[addKeyPrefix(key)] = value;
                 }
                 await sdk.saveBulkData(prefixedData);
-            } catch (error) {
-                console.warn('Failed to save data to SDK, falling back to localStorage', error);
+            } catch (_error) {
                 this.saveToLocalStorage(newData);
             }
         } else {

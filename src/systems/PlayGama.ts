@@ -56,8 +56,7 @@ export class PlayGamaSDK {
             this.initialized = true;
             await this.loadPlayer();
             return true;
-        } catch (error) {
-            console.error('Failed to initialize PlayGama SDK:', error);
+        } catch (_error) {
             return false;
         }
     }
@@ -86,8 +85,8 @@ export class PlayGamaSDK {
                 photos: this.bridge.player.photos,
                 extra: this.bridge.player.extra
             };
-        } catch (error) {
-            console.error('Failed to load player:', error);
+        } catch (_error) {
+            // ignore player load errors
         }
     }
 
@@ -98,8 +97,7 @@ export class PlayGamaSDK {
             await this.bridge.advertisement.showInterstitial();
             this.lastInterstitialTime = Date.now();
             return true;
-        } catch (error) {
-            console.error('Failed to show interstitial ad:', error);
+        } catch (_error) {
             return false;
         }
     }
@@ -108,20 +106,12 @@ export class PlayGamaSDK {
         if (!this.isInitialized() || !this.bridge) return false;
         if (!this.canShowInterstitial(minSeconds)) return false;
 
-        try {
-            const { Sound } = await import('./Sound');
-            Sound.pauseMusic();
-        } catch (e) {
-        }
+        try { await import('./Sound').then(m => m.Sound.pauseMusic()).catch(() => { }) } catch { }
 
         try {
             return await this.showInterstitialAd();
         } finally {
-            try {
-                const { Sound } = await import('./Sound');
-                await Sound.resumeMusic();
-            } catch (e) {
-            }
+            await import('./Sound').then(m => m.Sound.resumeMusic()).catch(() => { })
         }
     }
 
@@ -154,8 +144,7 @@ export class PlayGamaSDK {
         try {
             await this.bridge.advertisement.showRewarded(placement);
             return true;
-        } catch (error) {
-            console.error('Failed to show rewarded ad:', error);
+        } catch (_error) {
             return false;
         }
     }
@@ -180,8 +169,7 @@ export class PlayGamaSDK {
 
             localStorage.setItem(key, JSON.stringify(value));
             return true;
-        } catch (error) {
-            console.error('Failed to save data to cloud:', error);
+        } catch (_error) {
             localStorage.setItem(key, JSON.stringify(value));
             return false;
         }
@@ -211,8 +199,7 @@ export class PlayGamaSDK {
 
             const localData = localStorage.getItem(key);
             return localData ? JSON.parse(localData) : null;
-        } catch (error) {
-            console.error('Failed to load data from cloud:', error);
+        } catch (_error) {
             const localData = localStorage.getItem(key);
             return localData ? JSON.parse(localData) : null;
         }
@@ -246,8 +233,7 @@ export class PlayGamaSDK {
                 localStorage.setItem(key, JSON.stringify(value));
             }
             return true;
-        } catch (error) {
-            console.error('Failed to save bulk data to cloud:', error);
+        } catch (_error) {
             for (const [key, value] of Object.entries(data)) {
                 localStorage.setItem(key, JSON.stringify(value));
             }
@@ -302,8 +288,7 @@ export class PlayGamaSDK {
                 }
             }
             return result;
-        } catch (error) {
-            console.error('Failed to load bulk data from cloud:', error);
+        } catch (_error) {
             const result: Record<string, any> = {};
             for (const key of keys) {
                 const localData = localStorage.getItem(key);
@@ -321,8 +306,7 @@ export class PlayGamaSDK {
         try {
             await this.bridge.leaderboard.setScore(leaderboardId, score);
             return true;
-        } catch (error) {
-            console.error('Failed to submit score:', error);
+        } catch (_error) {
             return false;
         }
     }
@@ -344,8 +328,7 @@ export class PlayGamaSDK {
                 photo: entry.photo || '',
                 score: entry.score
             }));
-        } catch (error) {
-            console.error('Failed to get leaderboard:', error);
+        } catch (_error) {
             return [];
         }
     }
@@ -358,8 +341,7 @@ export class PlayGamaSDK {
                 text: text
             });
             return true;
-        } catch (error) {
-            console.error('Failed to share:', error);
+        } catch (_error) {
             return false;
         }
     }
@@ -370,8 +352,7 @@ export class PlayGamaSDK {
         try {
             await this.bridge.social.invite();
             return true;
-        } catch (error) {
-            console.error('Failed to invite friend:', error);
+        } catch (_error) {
             return false;
         }
     }
@@ -399,8 +380,8 @@ export class PlayGamaSDK {
             } else if (this.bridge.game && typeof this.bridge.game.ready === 'function') {
                 await this.bridge.game.ready();
             }
-        } catch (error) {
-            console.error('Failed to send game ready signal:', error);
+        } catch (_error) {
+            // ignore
         }
     }
 
@@ -413,8 +394,8 @@ export class PlayGamaSDK {
             } else if (this.bridge.game && typeof this.bridge.game.happyTime === 'function') {
                 await this.bridge.game.happyTime();
             }
-        } catch (error) {
-            console.error('Failed to send happy time event:', error);
+        } catch (_error) {
+            // ignore
         }
     }
 
@@ -427,8 +408,8 @@ export class PlayGamaSDK {
             } else if (this.bridge.game && typeof this.bridge.game.gameplayStart === 'function') {
                 await this.bridge.game.gameplayStart();
             }
-        } catch (error) {
-            console.error('Failed to send gameplay start event:', error);
+        } catch (_error) {
+            // ignore
         }
     }
 
@@ -441,8 +422,8 @@ export class PlayGamaSDK {
             } else if (this.bridge.game && typeof this.bridge.game.gameplayStop === 'function') {
                 await this.bridge.game.gameplayStop();
             }
-        } catch (error) {
-            console.error('Failed to send gameplay stop event:', error);
+        } catch (_error) {
+            // ignore
         }
     }
 
@@ -453,8 +434,8 @@ export class PlayGamaSDK {
             if (this.bridge.platform && typeof this.bridge.platform.sendMessage === 'function') {
                 await this.bridge.platform.sendMessage('player_got_achievement');
             }
-        } catch (error) {
-            console.error('Failed to send player_got_achievement event:', error);
+        } catch (_error) {
+            // ignore
         }
     }
 }

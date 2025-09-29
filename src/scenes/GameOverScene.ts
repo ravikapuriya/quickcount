@@ -56,7 +56,7 @@ export class GameOverScene extends Phaser.Scene {
             this.scene.start(SCENE_KEYS.MENU)
         })
 
-        // Rocket fire confetti from both bottom corners towards center
+        // Simple top-to-bottom falling confetti
         const confettiFrames = [
             'confetti_red.png',
             'confetti_blue.png',
@@ -67,88 +67,43 @@ export class GameOverScene extends Phaser.Scene {
             'confetti_white.png'
         ]
 
-        // Left rocket fire
-        for (let i = 0; i < 30; i++) {
+        // Create falling confetti pieces
+        for (let i = 0; i < 80; i++) {
             setTimeout(() => {
-                // Starting position: bottom left corner
-                const startX = 50 + Math.random() * 100
-                const startY = height - 50 - Math.random() * 100
-
-                // Target position: center area with some spread
-                const targetX = width / 2 + (Math.random() - 0.5) * 300
-                const targetY = height / 2 + (Math.random() - 0.5) * 200
+                // Random starting position across the top of screen
+                const startX = Math.random() * width
+                const startY = -50 - Math.random() * 200 // Start above screen
 
                 // Random confetti frame
                 const randomFrame = confettiFrames[Math.floor(Math.random() * confettiFrames.length)]
                 const confetti = this.add.sprite(startX, startY, ASSET_KEYS.CONFETTI, randomFrame)
 
-                // Scale and initial rotation
-                const scale = 0.4 + Math.random() * 0.3
+                // Random scale and rotation
+                const scale = 0.3 + Math.random() * 0.4
                 confetti.setScale(scale)
                 confetti.setRotation(Math.random() * Math.PI * 2)
 
-                // Rocket trajectory animation
+                // Fall down with gentle side-to-side sway
                 this.tweens.add({
                     targets: confetti,
-                    x: targetX,
-                    y: targetY,
-                    rotation: confetti.rotation + Math.PI * 3,
-                    duration: 800 + Math.random() * 400,
-                    ease: 'Power2.easeOut',
-                    onComplete: () => {
-                        // Explosion effect - small burst
-                        this.tweens.add({
-                            targets: confetti,
-                            scale: confetti.scale * 1.5,
-                            alpha: 0,
-                            duration: 200,
-                            onComplete: () => confetti.destroy()
-                        })
-                    }
+                    y: height + 100,
+                    x: startX + (Math.random() - 0.5) * 100, // Gentle horizontal drift
+                    rotation: confetti.rotation + Math.PI * 4,
+                    duration: 3000 + Math.random() * 2000, // 3-5 seconds fall time
+                    ease: 'Linear',
+                    onComplete: () => confetti.destroy()
                 })
-            }, i * 50) // Stagger the launches
-        }
 
-        // Right rocket fire
-        for (let i = 0; i < 30; i++) {
-            setTimeout(() => {
-                // Starting position: bottom right corner
-                const startX = width - 150 + Math.random() * 100
-                const startY = height - 50 - Math.random() * 100
-
-                // Target position: center area with some spread
-                const targetX = width / 2 + (Math.random() - 0.5) * 300
-                const targetY = height / 2 + (Math.random() - 0.5) * 200
-
-                // Random confetti frame
-                const randomFrame = confettiFrames[Math.floor(Math.random() * confettiFrames.length)]
-                const confetti = this.add.sprite(startX, startY, ASSET_KEYS.CONFETTI, randomFrame)
-
-                // Scale and initial rotation
-                const scale = 0.4 + Math.random() * 0.3
-                confetti.setScale(scale)
-                confetti.setRotation(Math.random() * Math.PI * 2)
-
-                // Rocket trajectory animation
+                // Additional gentle swaying motion
                 this.tweens.add({
                     targets: confetti,
-                    x: targetX,
-                    y: targetY,
-                    rotation: confetti.rotation + Math.PI * 3,
-                    duration: 800 + Math.random() * 400,
-                    ease: 'Power2.easeOut',
-                    onComplete: () => {
-                        // Explosion effect - small burst
-                        this.tweens.add({
-                            targets: confetti,
-                            scale: confetti.scale * 1.5,
-                            alpha: 0,
-                            duration: 200,
-                            onComplete: () => confetti.destroy()
-                        })
-                    }
+                    x: startX + Math.sin(i * 0.5) * 30,
+                    duration: 1000 + Math.random() * 1000,
+                    ease: 'Sine.easeInOut',
+                    yoyo: true,
+                    repeat: -1
                 })
-            }, i * 60) // Slightly different timing than left side
+            }, i * 100) // Stagger the confetti pieces
         }
     }
 }

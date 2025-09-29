@@ -114,7 +114,8 @@ export class GameScene extends Phaser.Scene {
         const rules = this.diff.getRules()
         this.currentQ = makeQuestion(rules, this.rng)
 
-        const { width } = this.scale
+        const { width } = this.scale;
+        this.add.image(width / 2, 200, 'chip').setAlpha(0.6);
         this.add.text(width / 2, 200, this.currentQ.text, {
             font: '52px MuseoSansRounded', color: '#e6edf3'
         }).setOrigin(0.5)
@@ -151,12 +152,15 @@ export class GameScene extends Phaser.Scene {
             ['slow', 'Slow']
         ]
         keys.forEach((k, i) => {
-            const x = width / 2 + (i - 1) * 220
-            const btn = this.add.image(x, barY, 'btn-outline').setInteractive({ useHandCursor: true })
+            const x = width / 2 + (i - 1) * 240  // Increased spacing from 220 to 240
+            const btn = this.add.image(x, barY, 'btn-outline')
+                .setOrigin(0.5)
+                .setScale(0.55)  // Scale down from 400x100 to ~220x55
+                .setInteractive({ useHandCursor: true })
             const uses = (k[0] === 'freeze' ? this.power.freeze : k[0] === 'fifty' ? this.power.fifty : this.power.slow)
             const displayText = uses > 0 ? `${k[1]} (${uses})` : `${k[1]} (+)`
             const txt = this.add.text(x, barY, displayText, {
-                font: '28px MuseoSansRounded', color: '#177CBF'
+                font: '24px MuseoSansRounded', color: '#177CBF', align: 'center'  // Reduced font size from 28px to 24px
             }).setOrigin(0.5)
 
             // Track powerup UI elements
@@ -170,12 +174,15 @@ export class GameScene extends Phaser.Scene {
                         return
                     }
                     if (await this.power.useFreeze(this.time.now)) {
-                        Sound.play('correct');
+                        Sound.play('click');
                         this.time.delayedCall(3000, () => this.power.unfreeze())
-                        this.drawPowerups() // Only redraw powerups, don't recreate question
-                    } else { Sound.play('wrong') }
+                        this.drawPowerups()
+                    } else {
+                        // no-op when not applied
+                    }
                 } else if (k[0] === 'fifty') {
                     if (this.power.fifty <= 0) {
+                        this.scene.pause(SCENE_KEYS.GAME);
                         this.scene.launch('PowerupPurchase', { powerupType: 'fifty' })
                         return
                     }
@@ -183,16 +190,21 @@ export class GameScene extends Phaser.Scene {
                         Sound.play('click');
                         this.applyFiftyFifty()
                         this.drawPowerups() // Only redraw powerups, don't recreate question
-                    } else { Sound.play('wrong') }
+                    } else {
+                        // TODO: Add not-applied sound effect for powerup use
+                    }
                 } else {
                     if (this.power.slow <= 0) {
+                        this.scene.pause(SCENE_KEYS.GAME);
                         this.scene.launch('PowerupPurchase', { powerupType: 'slow' })
                         return
                     }
                     if (await this.power.useSlow(this.time.now)) {
                         Sound.play('click')
-                        this.drawPowerups() // Only redraw powerups, don't recreate question
-                    } else { Sound.play('wrong') }
+                        this.drawPowerups()
+                    } else {
+                        // no-op when not applied
+                    }
                 }
             })
         })

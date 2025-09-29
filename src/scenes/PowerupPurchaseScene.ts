@@ -54,10 +54,10 @@ export class PowerupPurchaseScene extends Phaser.Scene {
         }).setOrigin(0.5)
 
         // Coins display with background - clickable for rewarded ads
-        const coinsBg = this.add.image(0, -70, ASSET_KEYS.GAME_UI, 'coins_bg')
-        coinsBg.setInteractive({ useHandCursor: true })
+        const coinsBg = this.add.image(0, -70, ASSET_KEYS.GAME_UI, 'coins_bg');
+        coinsBg.setInteractive({ useHandCursor: true }).setOrigin(0.5)
 
-        const coinsText = this.add.text(0, -70, `${save.coins}`, {
+        const coinsText = this.add.text(-10, -70, `${save.coins}`, {
             font: '24px MuseoSansRounded',
             color: '#fff',
             fontStyle: 'bold'
