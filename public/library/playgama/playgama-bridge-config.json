@@ -1,0 +1,65 @@
+{
+    "game": {
+        "id": "2048-drop",
+        "name": "2048 Drop",
+        "description": "A physics-based 2048 variant where tiles drop and merge",
+        "version": "1.0.0",
+        "orientation": "portrait"
+    },
+    "platforms": {
+        "yandex": {
+            "enabled": true,
+            "appId": ""
+        },
+        "vk": {
+            "enabled": true,
+            "appId": ""
+        },
+        "facebook": {
+            "enabled": true,
+            "appId": ""
+        },
+        "crazygames": {
+            "enabled": true
+        },
+        "gamedistribution": {
+            "enabled": true
+        },
+        "poki": {
+            "enabled": true
+        },
+        "playgama": {
+            "enabled": true
+        }
+    },
+    "payments": {
+        "enabled": false,
+        "products": []
+    },
+    "ads": {
+        "interstitial": {
+            "enabled": true,
+            "minInterval": 60
+        },
+        "rewarded": {
+            "enabled": true
+        },
+        "banner": {
+            "enabled": false
+        }
+    },
+    "leaderboards": {
+        "enabled": true,
+        "boards": [
+            {
+                "id": "highscore",
+                "name": "High Score"
+            }
+        ]
+    },
+    "features": {
+        "cloudSaves": true,
+        "analytics": true,
+        "social": true
+    }
+}

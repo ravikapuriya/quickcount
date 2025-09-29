@@ -1,0 +1,30 @@
+# Node.js dependencies and build output
+node_modules/
+dist/
+dist-ssr/
+temp/
+*.local
+
+# MD files
+CLAUDE.md
+WARP.md
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor and OS files
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
