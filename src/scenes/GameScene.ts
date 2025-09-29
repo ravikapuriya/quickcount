@@ -7,7 +7,8 @@ import type { Question } from '../data/types'
 import { Save } from '../systems/Save'
 import { Sound } from '../systems/Sound'
 import type { RNG } from '../systems/RNG'
-import { ASSET_KEYS, SCENE_KEYS } from '../data/gameConfigs'
+import { ASSET_KEYS, IS_BUILD, IS_PLAYGAMA, SCENE_KEYS } from '../data/gameConfigs'
+import { PlayGamaSDK } from '../systems/PlayGama'
 
 export class GameScene extends Phaser.Scene {
     private diff!: DifficultyManager
@@ -28,8 +29,19 @@ export class GameScene extends Phaser.Scene {
 
     async create() {
         const save = await Save.get();
+
+        const musicEnabled = await Sound.musicEnabled();
         Sound.init(this);
-        Sound.playMusic();
+        if (musicEnabled) {
+            Sound.playMusic();
+        }
+
+        if (IS_BUILD && IS_PLAYGAMA) {
+            const playGama = PlayGamaSDK.getInstance();
+            if (playGama.isInitialized()) {
+                await playGama.gameplayStart();
+            }
+        }
 
         const gameBg = this.add.image(this.scale.width / 2, this.scale.height / 2, ASSET_KEYS.GAME_BG);
         gameBg.setDisplaySize(this.scale.width, this.scale.height);
@@ -39,6 +51,7 @@ export class GameScene extends Phaser.Scene {
 
         this.diff = new DifficultyManager()
         this.power = new PowerupManager()
+        await this.power.loadPowerups()
 
         this.score = 0
         this.streak = 0
@@ -70,7 +83,12 @@ export class GameScene extends Phaser.Scene {
     }
 
     layout() {
-        const { width } = this.scale
+        const { width, height } = this.scale
+
+        // Recreate game background
+        const gameBg = this.add.image(width / 2, height / 2, ASSET_KEYS.GAME_BG);
+        gameBg.setDisplaySize(width, height);
+
         const modeText = this.mode === 'daily' ? 'Daily' : 'Classic'
         this.add.text(width / 2, 96, `${modeText} — Solve:`, {
             font: '30px MuseoSansRounded', color: '#F76F12'
@@ -121,20 +139,25 @@ export class GameScene extends Phaser.Scene {
             const x = width / 2 + (i - 1) * 220
             const btn = this.add.image(x, barY, 'btn-outline').setInteractive({ useHandCursor: true })
             const uses = (k[0] === 'freeze' ? this.power.freeze : k[0] === 'fifty' ? this.power.fifty : this.power.slow)
-            this.add.text(x, barY, `${k[1]} (${uses})`, {
+            const displayText = uses > 0 ? `${k[1]} (${uses})` : `${k[1]} (+)`
+            this.add.text(x, barY, displayText, {
                 font: '28px MuseoSansRounded', color: '#177CBF'
             }).setOrigin(0.5)
-            btn.on('pointerdown', () => {
+            btn.on('pointerdown', async () => {
                 if (k[0] === 'freeze') {
-                    if (this.power.useFreeze(this.time.now)) {
+                    if (await this.power.useFreeze(this.time.now)) {
                         Sound.play('correct');
                         this.time.delayedCall(3000, () => this.power.unfreeze())
                     } else { Sound.play('wrong') }
                 } else if (k[0] === 'fifty') {
-                    if (this.power.useFifty()) { Sound.play('click'); this.applyFiftyFifty() } else { Sound.play('wrong') }
+                    if (await this.power.useFifty()) { Sound.play('click'); this.applyFiftyFifty() } else { Sound.play('wrong') }
                 } else {
-                    if (this.power.useSlow(this.time.now)) { Sound.play('click') } else { Sound.play('wrong') }
+                    if (await this.power.useSlow(this.time.now)) { Sound.play('click') } else { Sound.play('wrong') }
                 }
+                // Redraw powerups to update the display
+                this.children.removeAll(true)
+                this.layout()
+                this.nextQuestion()
             })
         })
     }

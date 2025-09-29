@@ -34,7 +34,7 @@ export class GameOverScene extends Phaser.Scene {
             font: '32px MuseoSansRounded', color: '#3a3a3a'
         }).setOrigin(0.5)
 
-        const playAgain = this.add.image(width / 2, height - 320, 'btn').setInteractive({ useHandCursor: true })
+        const playAgain = this.add.image(width / 2, height - 250, 'btn').setInteractive({ useHandCursor: true })
         this.add.text(playAgain.x, playAgain.y, 'Play Again', {
             font: '32px MuseoSansRounded', color: '#fff'
         }).setOrigin(0.5)

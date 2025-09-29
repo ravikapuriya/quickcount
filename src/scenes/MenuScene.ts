@@ -2,7 +2,8 @@ import Phaser from 'phaser'
 import { Sound } from '../systems/Sound'
 import { dailyInfo } from '../systems/Daily'
 import { Save } from '../systems/Save'
-import { ASSET_KEYS, SCENE_KEYS } from '../data/gameConfigs'
+import { ASSET_KEYS, IS_BUILD, IS_PLAYGAMA, SCENE_KEYS } from '../data/gameConfigs'
+import { PlayGamaSDK } from '../systems/PlayGama'
 
 export class MenuScene extends Phaser.Scene {
     constructor() { super('Menu') }
@@ -22,8 +23,16 @@ export class MenuScene extends Phaser.Scene {
         this.add.text(classic.x, classic.y, 'Play Game', {
             font: '34px MuseoSansRounded', color: '#fff', align: 'center'
         }).setOrigin(0.5);
-        classic.on('pointerdown', () => {
+        classic.on('pointerdown', async () => {
             Sound.play('click');
+
+            if (IS_BUILD && IS_PLAYGAMA) {
+                const sdk = PlayGamaSDK.getInstance();
+                if (sdk.isInitialized()) {
+                    await sdk.showInterstitialAdWithSound(100);
+                }
+            }
+
             this.scene.start(SCENE_KEYS.GAME, { mode: 'classic' });
         });
 
