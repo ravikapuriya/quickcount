@@ -5,6 +5,7 @@ import { MenuScene } from './scenes/MenuScene'
 import { GameScene } from './scenes/GameScene'
 import { UIScene } from './scenes/UIScene'
 import { GameOverScene } from './scenes/GameOverScene'
+import { PowerupPurchaseScene } from './scenes/PowerupPurchaseScene'
 import { GameOptions } from './data/gameConfigs'
 
 
@@ -15,7 +16,7 @@ const config: Phaser.Types.Core.GameConfig = {
     height: GameOptions.gameHeight,
     backgroundColor: '#7BD5F9',
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-    scene: [BootScene, PreloadScene, MenuScene, GameScene, UIScene, GameOverScene]
+    scene: [BootScene, PreloadScene, MenuScene, GameScene, UIScene, GameOverScene, PowerupPurchaseScene]
 }
 
 new Phaser.Game(config)

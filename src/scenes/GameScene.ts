@@ -19,6 +19,8 @@ export class GameScene extends Phaser.Scene {
     private currentQ!: Question
     private choiceTexts: Phaser.GameObjects.Text[] = []
     private choiceZones: Phaser.GameObjects.Image[] = []
+    private powerupButtons: Phaser.GameObjects.Image[] = []
+    private powerupTexts: Phaser.GameObjects.Text[] = []
     private timerEvent!: Phaser.Time.TimerEvent
     private mode: 'classic' | 'daily' = 'classic'
     private rng: RNG | null = null
@@ -57,6 +59,13 @@ export class GameScene extends Phaser.Scene {
         this.streak = 0
         this.timeLeft = 60
         this.rng = this.mode === 'daily' ? dailyRNG() : null
+
+        // Listen for powerup purchases to refresh display
+        this.game.events.on('powerup:purchased', () => {
+            this.power.loadPowerups().then(() => {
+                this.drawPowerups()
+            })
+        })
 
         this.timerEvent = this.time.addEvent({
             delay: 100, loop: true, callback: () => {
@@ -128,6 +137,12 @@ export class GameScene extends Phaser.Scene {
     }
 
     drawPowerups() {
+        // Clear existing powerup UI elements
+        this.powerupButtons.forEach(btn => btn.destroy())
+        this.powerupTexts.forEach(txt => txt.destroy())
+        this.powerupButtons = []
+        this.powerupTexts = []
+
         const { width, height } = this.scale
         const barY = height - 140
         const keys: Array<['freeze' | 'fifty' | 'slow', string]> = [
@@ -140,24 +155,45 @@ export class GameScene extends Phaser.Scene {
             const btn = this.add.image(x, barY, 'btn-outline').setInteractive({ useHandCursor: true })
             const uses = (k[0] === 'freeze' ? this.power.freeze : k[0] === 'fifty' ? this.power.fifty : this.power.slow)
             const displayText = uses > 0 ? `${k[1]} (${uses})` : `${k[1]} (+)`
-            this.add.text(x, barY, displayText, {
+            const txt = this.add.text(x, barY, displayText, {
                 font: '28px MuseoSansRounded', color: '#177CBF'
             }).setOrigin(0.5)
+
+            // Track powerup UI elements
+            this.powerupButtons.push(btn)
+            this.powerupTexts.push(txt)
             btn.on('pointerdown', async () => {
                 if (k[0] === 'freeze') {
+                    if (this.power.freeze <= 0) {
+                        this.scene.pause(SCENE_KEYS.GAME);
+                        this.scene.launch('PowerupPurchase', { powerupType: 'freeze' })
+                        return
+                    }
                     if (await this.power.useFreeze(this.time.now)) {
                         Sound.play('correct');
                         this.time.delayedCall(3000, () => this.power.unfreeze())
+                        this.drawPowerups() // Only redraw powerups, don't recreate question
                     } else { Sound.play('wrong') }
                 } else if (k[0] === 'fifty') {
-                    if (await this.power.useFifty()) { Sound.play('click'); this.applyFiftyFifty() } else { Sound.play('wrong') }
+                    if (this.power.fifty <= 0) {
+                        this.scene.launch('PowerupPurchase', { powerupType: 'fifty' })
+                        return
+                    }
+                    if (await this.power.useFifty()) {
+                        Sound.play('click');
+                        this.applyFiftyFifty()
+                        this.drawPowerups() // Only redraw powerups, don't recreate question
+                    } else { Sound.play('wrong') }
                 } else {
-                    if (await this.power.useSlow(this.time.now)) { Sound.play('click') } else { Sound.play('wrong') }
+                    if (this.power.slow <= 0) {
+                        this.scene.launch('PowerupPurchase', { powerupType: 'slow' })
+                        return
+                    }
+                    if (await this.power.useSlow(this.time.now)) {
+                        Sound.play('click')
+                        this.drawPowerups() // Only redraw powerups, don't recreate question
+                    } else { Sound.play('wrong') }
                 }
-                // Redraw powerups to update the display
-                this.children.removeAll(true)
-                this.layout()
-                this.nextQuestion()
             })
         })
     }

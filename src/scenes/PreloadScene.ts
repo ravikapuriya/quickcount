@@ -43,19 +43,11 @@ export class PreloadScene extends Phaser.Scene {
         };
 
         for (const a of ATLAS_ASSETS) {
-            // this.load.atlas(a.assetKey, toUrl(a.path), toUrl(a.jsonPath));
+            this.load.atlas(a.assetKey, toUrl(a.path), toUrl(a.jsonPath));
         }
 
         for (const i of IMAGE_ASSETS) {
-            if (i.assetKey === 'CONFETTI') {
-                // Load confetti as spritesheet (6x6 grid = 36 frames)
-                this.load.spritesheet(i.assetKey, toUrl(i.path), {
-                    frameWidth: 128,
-                    frameHeight: 128
-                });
-            } else {
-                this.load.image(i.assetKey, toUrl(i.path));
-            }
+            this.load.image(i.assetKey, toUrl(i.path));
         }
 
         for (const au of AUDIO_ASSETS) {
