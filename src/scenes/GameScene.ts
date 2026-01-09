@@ -153,14 +153,14 @@ export class GameScene extends Phaser.Scene {
         ]
         keys.forEach((k, i) => {
             const x = width / 2 + (i - 1) * 240  // Increased spacing from 220 to 240
-            const btn = this.add.image(x, barY, 'btn-outline')
+            const btn = this.add.image(x, barY, 'btn')
                 .setOrigin(0.5)
                 .setScale(0.55)  // Scale down from 400x100 to ~220x55
                 .setInteractive({ useHandCursor: true })
             const uses = (k[0] === 'freeze' ? this.power.freeze : k[0] === 'fifty' ? this.power.fifty : this.power.slow)
             const displayText = uses > 0 ? `${k[1]} (${uses})` : `${k[1]} (+)`
             const txt = this.add.text(x, barY, displayText, {
-                font: '24px MuseoSansRounded', color: '#177CBF', align: 'center'  // Reduced font size from 28px to 24px
+                font: '24px MuseoSansRounded', color: '#fff', align: 'center'  // Reduced font size from 28px to 24px
             }).setOrigin(0.5)
 
             // Track powerup UI elements
